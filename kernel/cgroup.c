@@ -2865,110 +2865,24 @@ static int cgroup_attach_task(struct cgroup *dst_cgrp,
 	return ret;
 }
 
-#if defined(CONFIG_CPUSETS) && !defined(CONFIG_MTK_ACAO)
-void store_set_exclusive_task(struct task_struct *p)
+int subsys_cgroup_allow_attach(struct cgroup_subsys_state *css, struct cgroup_taskset *tset)
 {
-	struct set_excl_struct *set_excl_st;
-	unsigned long irq_flags;
+	const struct cred *cred = current_cred(), *tcred;
+	struct task_struct *task;
 
-	set_excl_st = kmalloc(sizeof(struct set_excl_struct), GFP_ATOMIC);
-	if (!set_excl_st)
-		return;
-	memset(set_excl_st, 0, sizeof(struct set_excl_struct));
-	INIT_LIST_HEAD(&(set_excl_st->list));
+	if (capable(CAP_SYS_NICE))
+		return 0;
 
-	spin_lock_irqsave(&set_excl_st_lock, irq_flags);
+	cgroup_taskset_for_each(task, css, tset) {
+		tcred = __task_cred(task);
 
-	excl_task_count++;
-	set_excl_st->pid = p->pid;
-	strncpy(set_excl_st->comm, p->comm, sizeof(set_excl_st->comm));
-	set_excl_st->comm[sizeof(set_excl_st->comm) - 1] = 0;
-	printk_deferred("sched: store exclusive task:%s, pid=%d, count=%d\n",
-			set_excl_st->comm, set_excl_st->pid, excl_task_count);
-
-	list_add(&(set_excl_st->list), &(set_excl_st_head.list));
-
-	spin_unlock_irqrestore(&set_excl_st_lock, irq_flags);
-}
-
-void save_set_exclusive_task(int pid)
-{
-	struct set_excl_struct *tmp;
-	int find = 0, top_cgrp_idx = 0;
-	struct list_head *list_head;
-	unsigned long irq_flags;
-	struct task_struct *p;
-
-	spin_lock_irqsave(&set_excl_st_lock, irq_flags);
-
-	list_head = &(set_excl_st_head.list);
-
-	rcu_read_lock();
-	p = find_task_by_vpid(pid);
-	if (p) {
-		printk_deferred("sched: exclusive task pid=%d, cgroup->id=%d\n",
-				pid, p->cgroups->subsys[CSS_CPUSET_ID]->cgroup->id);
-
-		top_cgrp_idx = p->cgroups->subsys[CSS_CPUSET_ID]->cgroup->id;
-
-		list_for_each_entry(tmp, list_head, list) {
-			if (!find && (tmp->pid == p->pid)) {
-				strncpy(tmp->comm, p->comm, sizeof(p->comm));
-				printk_deferred("sched: repeated exclusive task:%s, pid=%d, count=%d\n",
-						tmp->comm, tmp->pid, excl_task_count);
-				find = 1;
-			}
-		}
-	} else
-		printk_deferred("sched: save: exclusive task no exist, pid=%d\n", pid);
-
-	rcu_read_unlock();
-	spin_unlock_irqrestore(&set_excl_st_lock, irq_flags);
-
-	if (!find && p && top_cgrp_idx == SS_TOP_GROUP_ID)
-		store_set_exclusive_task(p);
-}
-
-void remove_set_exclusive_task(int pid, bool task_exit)
-{
-	struct set_excl_struct *tmp, *tmp2;
-	unsigned long irq_flags;
-	struct task_struct *p;
-	int unplug = 0;
-
-	spin_lock_irqsave(&set_excl_st_lock, irq_flags);
-
-	rcu_read_lock();
-	p = find_task_by_vpid(pid);
-	if (p) {
-		list_for_each_entry_safe(tmp, tmp2, &set_excl_st_head.list, list) {
-			if (tmp->pid == p->pid) {
-				excl_task_count--;
-				if (task_exit == 0)
-					printk_deferred("sched: write exclusive task to other cgroup\n");
-				else
-					printk_deferred("sched: exclusive task exit\n");
-
-				printk_deferred("sched: remove exclusive task:%s, pid=%d, count=%d\n",
-						tmp->comm, tmp->pid, excl_task_count);
-				list_del(&(tmp->list));
-				kfree(tmp);
-				if (excl_task_count == 0)
-					unplug = 1;
-			}
-		}
-	} else
-		printk_deferred("sched: remove: exclusive task no exist, pid=%d\n", pid);
-	rcu_read_unlock();
-
-	spin_unlock_irqrestore(&set_excl_st_lock, irq_flags);
-
-	if (unplug == 1) {
-		perfmgr_forcelimit_cpuset_cancel();
-		printk_deferred("sched: exclusive core unplug\n");
+		if (current != task && !uid_eq(cred->euid, tcred->uid) &&
+		    !uid_eq(cred->euid, tcred->suid))
+			return -EACCES;
 	}
+
+	return 0;
 }
-#endif /* CONFIG_CPUSETS && MTK_VR_HIGH_PERFORMANCE_SUPPORT && !MTK_ACAO */
 
 static int cgroup_procs_write_permission(struct task_struct *task,
 					 struct cgroup *dst_cgrp,
