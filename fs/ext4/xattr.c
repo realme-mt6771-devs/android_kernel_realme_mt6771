@@ -640,7 +640,7 @@ static size_t ext4_xattr_free_space(struct ext4_xattr_entry *last,
 
 static int
 ext4_xattr_set_entry(struct ext4_xattr_info *i, struct ext4_xattr_search *s,
-	struct inode *inode)
+		     struct inode *inode)
 {
 	struct ext4_xattr_entry *last, *next;
 	size_t free, min_offs = s->end - s->base, name_len = strlen(i->name);
