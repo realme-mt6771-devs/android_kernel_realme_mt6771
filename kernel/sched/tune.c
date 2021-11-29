@@ -253,9 +253,9 @@ schedtune_accept_deltas(int nrg_delta, int cap_delta,
  *    value
  */
 #ifdef CONFIG_MTK_IO_BOOST
-#define BOOSTGROUPS_COUNT 6
+#define BOOSTGROUPS_COUNT 7
 #else
-#define BOOSTGROUPS_COUNT 5
+#define BOOSTGROUPS_COUNT 7
 #endif
 
 /* Array of configured boostgroups */
