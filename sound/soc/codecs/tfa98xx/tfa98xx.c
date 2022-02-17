@@ -2597,7 +2597,7 @@ retry:
 	else {
 		/* Yongzhi.Zhang@PSW.MM.AudioDriver.SmartPA, 2018/01/27,
 		 * modify for TFA firmware multi-project shared baseline */
-		sprintf(fw_name,"tfa/oppo6771_%d/tfa98xx.cnt", get_project());
+		sprintf(fw_name,"tfa/oppo6771_18611/tfa98xx.cnt");
 		sprintf(fw_comm_name,"tfa/common/tfa98xx.cnt");
 	}
 	pr_warning("%s: ID revision 0x%04x, fw_name is %s, fw_comm_name is %s\n", __func__, reg, fw_name, fw_comm_name);

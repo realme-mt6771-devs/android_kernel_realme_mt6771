@@ -2433,13 +2433,13 @@ retry:
 	if ((get_project() == 17197) || (get_project() == 18311) || (get_project() == 18011) || (get_project() == 18531) ||
 		(get_project() == 18561) || (get_project() == 18161)) {
 		if(reg == 0x94) {/* tfa9894 */
-			sprintf(fw_name,"tfa/oppo6771_%d/tfa9894/tfa98xx.cnt", get_project());
+			sprintf(fw_name,"tfa/oppo6771_%d/tfa9894/tfa98xx.cnt");
 		} else {/* tfa9890 */
-			sprintf(fw_name,"tfa/oppo6771_%d/tfa98xx.cnt", get_project());
+			sprintf(fw_name,"tfa/oppo6771_18611/tfa98xx.cnt");
 			sprintf(fw_comm_name,"tfa/common/tfa98xx.cnt");
 		}
 	} else {/* tfa9890 */
-			sprintf(fw_name,"tfa/oppo6771_%d/tfa98xx.cnt", get_project());
+			sprintf(fw_name,"tfa/oppo6771_18611/tfa98xx.cnt");
 			sprintf(fw_comm_name,"tfa/common/tfa98xx.cnt");
 	}
 
