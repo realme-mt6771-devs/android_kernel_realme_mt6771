@@ -24,44 +24,44 @@ static unsigned int init_project_version(void)
 {
 	struct device_node *np = NULL;
 	int ret = 0;
-    printk("init_project_version start\n");
+    pr_debug("init_project_version start\n");
 	if(format == NULL)
 		format = &projectInfo;
 
 	np = of_find_node_by_name(NULL, "oppo_project");
 	if(!np){
-		printk("init_project_version error1");
+		pr_debug("init_project_version error1");
 		return 0;
 	}
 
 	ret = of_property_read_u32(np,"nProject",&(format->nProject));
 	if(ret)
 	{
-		printk("init_project_version error2");
+		pr_debug("init_project_version error2");
 		return 0;
 	}
 
 	ret = of_property_read_u32(np,"nModem",&(format->nModem));
 	if(ret)
 	{
-		printk("init_project_version error3");
+		pr_debug("init_project_version error3");
 		return 0;
 	}
 
 	ret = of_property_read_u32(np,"nOperator",&(format->nOperator));
 	if(ret)
 	{
-		printk("init_project_version error4");
+		pr_debug("init_project_version error4");
 		return 0;
 	}
 
 	ret = of_property_read_u32(np,"nPCBVersion",&(format->nPCBVersion));
 	if(ret)
 	{
-		printk("init_project_version error5");
+		pr_debug("init_project_version error5");
 		return 0;
 	}
-	printk("KE Version Info :Project(%d) Modem(%d) Operator(%d) PCB(%d)\n",
+	pr_debug("KE Version Info :Project(%d) Modem(%d) Operator(%d) PCB(%d)\n",
 		format->nProject,format->nModem,format->nOperator,format->nPCBVersion);
 
 	return format->nProject;
@@ -225,11 +225,11 @@ static ssize_t secureType_read_proc(struct file *file, char __user *buf,
 	//oem_config_base = ioremap(0x58034 , 10);
 	//secure_oem_config = __raw_readl(oem_config_base);
 	//iounmap(oem_config_base);
-        printk(KERN_EMERG "lycan test secure_oem_config 0x%x\n", secure_oem_config);
+        pr_debug(KERN_EMERG "lycan test secure_oem_config 0x%x\n", secure_oem_config);
         #else
 	int secure_oem_config = 0;
 	secure_oem_config = sec_schip_enabled();
-	printk(KERN_EMERG "lycan test secure_oem_config %d\n", secure_oem_config);
+	pr_debug(KERN_EMERG "lycan test secure_oem_config %d\n", secure_oem_config);
         #endif /* VENDOR_EDIT */
 
 	len = sprintf(page,"%d", secure_oem_config);

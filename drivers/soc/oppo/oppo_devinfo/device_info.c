@@ -33,12 +33,12 @@
 
 #define DEVINFO_ERR(a,arg...) \
  do { \
-		printk(KERN_NOTICE log_fmt(a),__LINE__,DEVINFO_NAME,__func__,##arg); \
+		pr_debug(KERN_NOTICE log_fmt(a),__LINE__,DEVINFO_NAME,__func__,##arg); \
   } while (0)
 
 #define DEVINFO_MSG(a, arg...) \
  do { \
-		printk(KERN_INFO log_fmt(a),__LINE__,DEVINFO_NAME,__func__,##arg); \
+		pr_debug(KERN_INFO log_fmt(a),__LINE__,DEVINFO_NAME,__func__,##arg); \
   } while (0)
 
 /**definfo log end**/
