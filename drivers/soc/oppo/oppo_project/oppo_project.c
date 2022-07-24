@@ -70,11 +70,7 @@ static unsigned int init_project_version(void)
 
 unsigned int get_project(void)
 {
-	if(format)
-		return format->nProject;
-	else
-		return init_project_version();
-	return 0;
+	return 18611; // HACK: Explicitly return 18611 projectname, might help force loadio tfa98xx audio fw?
 }
 
 /* xiang.fei@PSW.MM.AudioDriver.Machine, 2018/05/28, Add for kernel driver */
